@@ -1,0 +1,33 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Base.Theme.PickUp" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Base colors -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <color name="colorPrimary">#000000</color>
+    <color name="colorPrimaryDark">#CCCCCC</color>
+    <color name="colorAccent">#FFFFFF</color>
+
+    <style name="Theme.PickUp" parent="Base.Theme.PickUp" />
+
+    <style name="Theme.PickUp.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.PickUp.AppBarOverlay" parent="ThemeOverlay.Material3.Dark.ActionBar">
+        <item name="colorOnPrimary">@color/colorAccent</item>
+    </style>
+
+    <style name="Theme.PickUp.PopupOverlay" parent="ThemeOverlay.Material3.Light">
+        <item name="colorOnSurface">@color/colorAccent</item>
+    </style>
+
+</resources>
