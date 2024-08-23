@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bussiness.pickup.databinding.ActivityRiderLoginBinding
 import com.bussiness.pickup.riderStack.riderModel.DriverInfoModel
+import com.bussiness.pickup.riderStack.utils.UserUtils
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
@@ -71,6 +72,7 @@ class RiderLoginActivity : AppCompatActivity() {
                     val token = task.result
 
                     // Handle the token (e.g., send it to your server)
+                    UserUtils.updateToken(this@RiderLoginActivity,token)
                     Toast.makeText(this@RiderLoginActivity, "Token: $token", Toast.LENGTH_LONG).show()
                 }
                 .addOnFailureListener { e ->
