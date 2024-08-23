@@ -25,6 +25,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.util.concurrent.TimeUnit
@@ -59,6 +60,22 @@ class RiderLoginActivity : AppCompatActivity() {
         init()
 
         if (firebaseAuth.currentUser != null) {
+            FirebaseMessaging.getInstance().token
+                .addOnCompleteListener { task ->
+                    if (!task.isSuccessful) {
+                        Toast.makeText(this@RiderLoginActivity, "Failed to get token", Toast.LENGTH_LONG).show()
+                        return@addOnCompleteListener
+                    }
+
+                    // Get the FCM token
+                    val token = task.result
+
+                    // Handle the token (e.g., send it to your server)
+                    Toast.makeText(this@RiderLoginActivity, "Token: $token", Toast.LENGTH_LONG).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this@RiderLoginActivity, e.message, Toast.LENGTH_LONG).show()
+                }
             // Show progress bar while checking user role
             checkUserRoles()
         } else {
