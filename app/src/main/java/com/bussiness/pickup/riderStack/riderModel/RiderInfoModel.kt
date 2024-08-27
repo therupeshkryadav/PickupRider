@@ -1,7 +1,7 @@
 package com.bussiness.pickup.riderStack.riderModel
 
 
-class DriverInfoModel {
+class RiderInfoModel {
     var role: String = ""
     var firstName:String=""
     var lastName:String=""

@@ -10,7 +10,7 @@ import android.view.Window
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bussiness.pickup.databinding.ActivityRiderLoginBinding
-import com.bussiness.pickup.riderStack.riderModel.DriverInfoModel
+import com.bussiness.pickup.riderStack.riderModel.RiderInfoModel
 import com.bussiness.pickup.riderStack.utils.UserUtils
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.firebase.FirebaseException
@@ -36,7 +36,7 @@ class RiderLoginActivity : AppCompatActivity() {
     companion object {
          lateinit var firebaseAuth: FirebaseAuth
          lateinit var database: FirebaseDatabase
-         lateinit var driverInfoReference: DatabaseReference
+         lateinit var riderInfoReference: DatabaseReference
          lateinit var storageReference: StorageReference
 
         fun init() {
@@ -44,7 +44,7 @@ class RiderLoginActivity : AppCompatActivity() {
                 firebaseAuth = FirebaseAuth.getInstance()
                 database = FirebaseDatabase.getInstance()
                 storageReference = FirebaseStorage.getInstance().reference
-                driverInfoReference = database.getReference("Users").child(RiderCommon.DRIVER_INFO_REFERENCE)
+                riderInfoReference = database.getReference("Users").child(RiderCommon.RIDER_INFO_REFERENCE)
             }
         }
     }
@@ -102,7 +102,7 @@ class RiderLoginActivity : AppCompatActivity() {
         progressDialog.show()
 
         val userId = firebaseAuth.currentUser?.uid ?: return
-        val userRef = driverInfoReference.child(userId)
+        val userRef = riderInfoReference.child(userId)
 
         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -116,7 +116,7 @@ class RiderLoginActivity : AppCompatActivity() {
                     initUI() // Initialize the UI only if the role check fails
                     Toast.makeText(
                         this@RiderLoginActivity,
-                        "User is not a customer.",
+                        "User is not a rider.",
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -235,12 +235,12 @@ class RiderLoginActivity : AppCompatActivity() {
     }
 
     private fun checkUserFromFirebase() {
-        driverInfoReference
+        riderInfoReference
             .child(firebaseAuth.currentUser!!.uid)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
-                        val model = snapshot.getValue(DriverInfoModel::class.java)
+                        val model = snapshot.getValue(RiderInfoModel::class.java)
                         goToRiderActivity(model)
                     } else {
                         showRegisterLayout()
@@ -323,7 +323,7 @@ class RiderLoginActivity : AppCompatActivity() {
                 lastName.isEmpty() -> Toast.makeText(this, "Please Enter Last Name", Toast.LENGTH_SHORT).show()
                 phoneNumber.isEmpty() -> Toast.makeText(this, "Please Enter Phone Number", Toast.LENGTH_SHORT).show()
                 else -> {
-                    val model = DriverInfoModel().apply {
+                    val model = RiderInfoModel().apply {
                         this.firstName = firstName
                         this.lastName = lastName
                         this.phoneNumber = fullPhoneNumber
@@ -331,7 +331,7 @@ class RiderLoginActivity : AppCompatActivity() {
                         this.role = "rider"
                     }
 
-                    driverInfoReference.child(firebaseAuth.currentUser!!.uid)
+                    riderInfoReference.child(firebaseAuth.currentUser!!.uid)
                         .setValue(model)
                         .addOnFailureListener { e ->
                             Toast.makeText(this, "Registration failed: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -349,7 +349,7 @@ class RiderLoginActivity : AppCompatActivity() {
 
     }
 
-    private fun goToRiderActivity(model: DriverInfoModel?) {
+    private fun goToRiderActivity(model: RiderInfoModel?) {
         RiderCommon.currentUser = model
         startActivity(Intent(this@RiderLoginActivity, RiderActivity::class.java))
         finish()

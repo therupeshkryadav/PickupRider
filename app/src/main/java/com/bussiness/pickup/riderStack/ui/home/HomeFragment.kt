@@ -63,7 +63,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     //Online System
     private lateinit var onlineRef:DatabaseReference
     private var currentUserRef:DatabaseReference?=null
-    private lateinit var driverLocationRef:DatabaseReference
+    private lateinit var riderLocationRef:DatabaseReference
     private lateinit var geofire: GeoFire
 
     private val onlineEventListener = object:ValueEventListener{
@@ -146,12 +146,12 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                     addressList= geocoder.getFromLocation(locationResult.lastLocation!!.latitude,
                         locationResult.lastLocation!!.longitude,1)!!
                     val cityName= addressList[0].locality
-                    driverLocationRef = RiderLoginActivity.database.getReference(RiderCommon.DRIVER_LOCATION_REFERENCE)
+                    riderLocationRef = RiderLoginActivity.database.getReference(RiderCommon.RIDER_LOCATION_REFERENCE)
                         .child(cityName)
-                    currentUserRef = driverLocationRef.child(
+                    currentUserRef = riderLocationRef.child(
                         FirebaseAuth.getInstance().currentUser!!.uid
                     )
-                    geofire= GeoFire(driverLocationRef)
+                    geofire= GeoFire(riderLocationRef)
 
                     // Update location
 

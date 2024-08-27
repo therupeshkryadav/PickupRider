@@ -9,8 +9,7 @@ import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.bussiness.pickup.R
-import com.bussiness.pickup.riderStack.riderModel.DriverInfoModel
-import java.util.Arrays
+import com.bussiness.pickup.riderStack.riderModel.RiderInfoModel
 
 object RiderCommon {
     // Use safe calls to avoid NullPointerException
@@ -63,7 +62,7 @@ object RiderCommon {
     val NOTI_TITLE: String = "title"
 
     val TOKEN_REFERENCE: String = "Token"
-    var currentUser: DriverInfoModel? = null
-    val DRIVER_INFO_REFERENCE: String = "DriverInfo"
-    val DRIVER_LOCATION_REFERENCE: String = "DriversLocation"
+    var currentUser: RiderInfoModel? = null
+    val RIDER_INFO_REFERENCE: String = "RiderInfo"
+    val RIDER_LOCATION_REFERENCE: String = "RidersLocation"
 }
