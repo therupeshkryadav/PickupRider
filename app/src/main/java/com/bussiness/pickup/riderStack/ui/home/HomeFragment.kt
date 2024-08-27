@@ -4,6 +4,8 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.location.Address
+import android.location.Geocoder
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
@@ -44,6 +46,8 @@ import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
+import java.io.IOException
+import java.util.Locale
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
 
@@ -58,14 +62,14 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     //Online System
     private lateinit var onlineRef:DatabaseReference
-    private lateinit var currentUserRef:DatabaseReference
+    private var currentUserRef:DatabaseReference?=null
     private lateinit var driverLocationRef:DatabaseReference
     private lateinit var geofire: GeoFire
 
     private val onlineEventListener = object:ValueEventListener{
         override fun onDataChange(snapshot: DataSnapshot) {
-            if(snapshot.exists())
-                currentUserRef.onDisconnect().removeValue()
+            if(snapshot.exists() && currentUserRef!=null)
+                currentUserRef!!.onDisconnect().removeValue()
         }
 
         override fun onCancelled(error: DatabaseError) {
@@ -117,14 +121,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private fun init() {
 
         onlineRef = RiderLoginActivity.database.getReference().child(".info/connected")
-        driverLocationRef = RiderLoginActivity.database.getReference(RiderCommon.DRIVER_LOCATION_REFERENCE)
-        currentUserRef = driverLocationRef.child(
-            FirebaseAuth.getInstance().currentUser!!.uid
-        )
 
-        geofire= GeoFire(driverLocationRef)
 
-        registerOnlineSystem()
+
 
         locationRequest = LocationRequest()
         locationRequest.setPriority(PRIORITY_HIGH_ACCURACY)
@@ -143,18 +142,41 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                     locationResult.lastLocation!!.longitude)
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newPos,18f))
 
-                // Update location
+                val geocoder = Geocoder(requireContext(), Locale.getDefault())
+                val addressList : List<Address>
+                try{
 
-                geofire.setLocation(
-                    RiderLoginActivity.firebaseAuth.currentUser!!.uid,
-                    GeoLocation(locationResult.lastLocation!!.latitude,
-                        locationResult.lastLocation!!.longitude),
-                ){ key:String?, error:DatabaseError? ->
-                    if(error != null)
-                        Snackbar.make(mapFragment.requireView(),error.message,Snackbar.LENGTH_LONG).show()
-                    else
-                        Snackbar.make(mapFragment.requireView(),"You're online!",Snackbar.LENGTH_SHORT).show()
+                    addressList= geocoder.getFromLocation(locationResult.lastLocation!!.latitude,
+                        locationResult.lastLocation!!.longitude,1)!!
+                    val cityName= addressList[0].locality
+                    driverLocationRef = RiderLoginActivity.database.getReference(RiderCommon.DRIVER_LOCATION_REFERENCE)
+                        .child(cityName)
+                    currentUserRef = driverLocationRef.child(
+                        FirebaseAuth.getInstance().currentUser!!.uid
+                    )
+                    geofire= GeoFire(driverLocationRef)
+
+                    // Update location
+
+                    geofire.setLocation(
+                        RiderLoginActivity.firebaseAuth.currentUser!!.uid,
+                        GeoLocation(locationResult.lastLocation!!.latitude,
+                            locationResult.lastLocation!!.longitude),
+                    ){ key:String?, error:DatabaseError? ->
+                        if(error != null)
+                            Snackbar.make(mapFragment.requireView(),error.message,Snackbar.LENGTH_LONG).show()
+                        else
+                            Snackbar.make(mapFragment.requireView(),"You're online!",Snackbar.LENGTH_SHORT).show()
+                    }
+
+                    registerOnlineSystem()
+
+                }catch (e:IOException)
+                {
+                    Snackbar.make(requireView(),e.message!!,Snackbar.LENGTH_SHORT).show()
                 }
+
+
             }
         }
 
