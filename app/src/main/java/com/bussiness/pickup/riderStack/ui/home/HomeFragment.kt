@@ -122,9 +122,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
         onlineRef = RiderLoginActivity.database.getReference().child(".info/connected")
 
-
-
-
         locationRequest = LocationRequest()
         locationRequest.setPriority(PRIORITY_HIGH_ACCURACY)
         locationRequest.setFastestInterval(3000)
