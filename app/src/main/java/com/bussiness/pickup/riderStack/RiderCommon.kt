@@ -12,6 +12,13 @@ import com.bussiness.pickup.R
 import com.bussiness.pickup.riderStack.riderModel.RiderInfoModel
 
 object RiderCommon {
+    val NOTI_BODY: String = "body"
+    val NOTI_TITLE: String = "title"
+
+    val TOKEN_REFERENCE: String = "Token"
+    var currentUser: RiderInfoModel? = null
+    val RIDER_INFO_REFERENCE: String = "RiderInfo"
+    val RIDER_LOCATION_REFERENCE: String = "RidersLocation"
     // Use safe calls to avoid NullPointerException
     fun buildWelcomeMessage(): String {
         val firstName = currentUser!!.firstName ?: "User"
@@ -57,12 +64,4 @@ object RiderCommon {
         notificationManager.notify(id,notification)
 
     }
-
-    val NOTI_BODY: String = "body"
-    val NOTI_TITLE: String = "title"
-
-    val TOKEN_REFERENCE: String = "Token"
-    var currentUser: RiderInfoModel? = null
-    val RIDER_INFO_REFERENCE: String = "RiderInfo"
-    val RIDER_LOCATION_REFERENCE: String = "RidersLocation"
 }
