@@ -1,5 +1,6 @@
 package com.bussiness.pickup.riderStack
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -24,6 +25,12 @@ import com.bussiness.pickup.riderStack.utils.UserUtils
 import com.bussiness.pickup.ChoiceActivity
 import com.bussiness.pickup.R
 import com.bussiness.pickup.databinding.ActivityRiderBinding
+import com.bussiness.pickup.riderStack.riderModel.RiderInfoModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 
@@ -88,23 +95,47 @@ class RiderActivity : AppCompatActivity() {
         val txt_star = headerView.findViewById<View>(R.id.txt_star) as TextView
         img_avatar = headerView.findViewById<View>(R.id.img_avatar) as ImageView
 
-        txt_name.text = RiderCommon.buildWelcomeMessage() ?: "Welcome!"
-        txt_phone.text = RiderCommon.currentUser?.phoneNumber ?: "Not Available"
-        txt_star.text = RiderCommon.currentUser?.rating?.toString() ?: "N/A"
+        var riderInfoReference =
+            FirebaseDatabase.getInstance().getReference("Users").child(RiderCommon.RIDER_INFO_REFERENCE)
+        riderInfoReference
+            .child(FirebaseAuth.getInstance().currentUser!!.uid)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                @SuppressLint("SetTextI18n")
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        val model = snapshot.getValue(RiderInfoModel::class.java)
+                        println("FIREBASE_USER => $model")
 
-        RiderCommon.currentUser?.avatar?.takeIf { it.isNotEmpty() }?.let {
-            Glide.with(this)
-                .load(RiderCommon.currentUser!!.avatar)
-                .into(img_avatar)
-        }
+                        model?.let {
+                            // Setting up the UI
+                            txt_name.text = listOfNotNull(it.firstName, it.lastName).joinToString(" ")
+                            txt_phone.text = it.phoneNumber.orEmpty()
+                            txt_star.text = it.rating.toString()
 
-        img_avatar.setOnClickListener {
-            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                type = "image/*"
-                addCategory(Intent.CATEGORY_OPENABLE)
-            }
-            startActivityForResult(Intent.createChooser(intent, "SELECT PICTURES"), PICK_IMAGE_REQUEST)
-        }
+                            // Load the image in img_avatar using Glide
+                            Glide.with(this@RiderActivity)
+                                .load(it.avatar)
+                                .into(img_avatar)
+
+                            // Set up click listener for avatar image
+                            img_avatar.setOnClickListener {
+                                val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                                    type = "image/*"
+                                    addCategory(Intent.CATEGORY_OPENABLE)
+                                }
+                                startActivityForResult(Intent.createChooser(intent, "SELECT PICTURE"), PICK_IMAGE_REQUEST)
+                            }
+                        }
+                    }
+                    else {
+                        println("FIREBASE_USER => user not exist")
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+
+                }
+            })
     }
 
 

@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.View
 import android.widget.Toast
 import com.bussiness.pickup.riderStack.riderModel.TokenInfoModel
+import com.google.android.gms.common.internal.service.Common
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -16,7 +17,7 @@ object UserUtils {
         updateData:Map<String,Any>
     ){
         FirebaseDatabase.getInstance()
-            .getReference(RiderCommon.RIDER_INFO_REFERENCE)
+            .getReference("Users").child(RiderCommon.RIDER_INFO_REFERENCE)
             .child(FirebaseAuth.getInstance().currentUser!!.uid)
             .updateChildren(updateData)
             .addOnFailureListener{e->
