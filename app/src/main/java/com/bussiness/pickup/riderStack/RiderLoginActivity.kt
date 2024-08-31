@@ -286,6 +286,7 @@ class RiderLoginActivity : AppCompatActivity() {
         val edtLastName = binding.lastName
         val edtPhone = binding.txtPhone
         val btnContinue = binding.continueTag
+        val edtEmail = binding.email
         // Use libphonenumber to parse the phone number
 
         val phoneNumberUtil = PhoneNumberUtil.getInstance()
@@ -316,6 +317,7 @@ class RiderLoginActivity : AppCompatActivity() {
             val firstName = edtFirstName.text.toString().trim()
             val lastName = edtLastName.text.toString().trim()
             val phoneNumber = edtPhone.text.toString().trim()
+            val email = edtEmail.text.toString().trim()
             val fullPhoneNumber = "+${binding.ccp2.selectedCountryCode}${phoneNumber}"
 
             when {
@@ -327,6 +329,7 @@ class RiderLoginActivity : AppCompatActivity() {
                         this.firstName = firstName
                         this.lastName = lastName
                         this.phoneNumber = fullPhoneNumber
+                        this.email = email
                         this.rating = 0.0
                         this.role = "rider"
                     }

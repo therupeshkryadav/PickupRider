@@ -19,6 +19,7 @@ object RiderCommon {
     var currentUser: RiderInfoModel? = null
     val RIDER_INFO_REFERENCE: String = "RiderInfo"
     val RIDER_LOCATION_REFERENCE: String = "RidersLocation"
+
     // Use safe calls to avoid NullPointerException
     fun buildWelcomeMessage(): String {
         val firstName = currentUser!!.firstName ?: "User"

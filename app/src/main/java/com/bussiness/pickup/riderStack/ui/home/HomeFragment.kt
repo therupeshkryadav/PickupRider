@@ -1,5 +1,6 @@
 package com.bussiness.pickup.riderStack.ui.home
 
+import RiderCommon
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
@@ -39,6 +40,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
@@ -83,12 +85,12 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private val binding get() = _binding!!
 
     override fun onDestroy() {
-        super.onDestroy()
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
         FirebaseAuth.getInstance().currentUser?.let { user ->
             geofire.removeLocation(user.uid)
         }
         onlineRef.removeEventListener(onlineEventListener)
+        super.onDestroy()
     }
 
     override fun onResume() {
@@ -124,9 +126,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
         locationRequest = LocationRequest()
         locationRequest.setPriority(PRIORITY_HIGH_ACCURACY)
-        locationRequest.setFastestInterval(3000)
-        locationRequest.interval = 5000
-        locationRequest.setSmallestDisplacement(10f)
+        locationRequest.setFastestInterval(15000)  // 15 sec
+        locationRequest.interval = 10000  // 10 sec
+        locationRequest.setSmallestDisplacement(50f)   // 50m
 
 
         locationCallback = object : LocationCallback(){
@@ -162,8 +164,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                     ){ key:String?, error:DatabaseError? ->
                         if(error != null)
                             Snackbar.make(mapFragment.requireView(),error.message,Snackbar.LENGTH_LONG).show()
-                        else
-                            Snackbar.make(mapFragment.requireView(),"You're online!",Snackbar.LENGTH_SHORT).show()
                     }
 
                     registerOnlineSystem()
@@ -227,6 +227,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                     mMap.isMyLocationEnabled = true
                     mMap.uiSettings.isMyLocationButtonEnabled = true
                     mMap.setOnMyLocationClickListener {
+
                         fusedLocationProviderClient.lastLocation
                             .addOnFailureListener{e ->
                                 Toast.makeText(
@@ -242,10 +243,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                     }
 
                     //layout
-                    val view = mapFragment.requireView()
+                    val locationButton = (mapFragment.requireView()
                         .findViewById<View>("1".toInt())
-                        .parent as View
-                    val locationButton = view.findViewById<View>("2".toInt())
+                        .parent as View).findViewById<View>("2".toInt())
                     val params = locationButton.layoutParams as RelativeLayout.LayoutParams
                     params.addRule(RelativeLayout.ALIGN_TOP,0)
                     params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE)
@@ -278,7 +278,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         {
             Log.e("EDMT_ERROR", e.message.toString())
         }
-
-
+        Snackbar.make(mapFragment.requireView(),"You're online!",Snackbar.LENGTH_SHORT).show()
     }
 }

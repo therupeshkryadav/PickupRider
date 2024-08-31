@@ -93,6 +93,7 @@ class RiderActivity : AppCompatActivity() {
         val txt_name = headerView.findViewById<View>(R.id.txt_name) as TextView
         val txt_phone = headerView.findViewById<View>(R.id.txt_phone) as TextView
         val txt_star = headerView.findViewById<View>(R.id.txt_star) as TextView
+        val txt_email = headerView.findViewById<View>(R.id.txt_email) as TextView
         img_avatar = headerView.findViewById<View>(R.id.img_avatar) as ImageView
 
         var riderInfoReference =
@@ -110,11 +111,13 @@ class RiderActivity : AppCompatActivity() {
                             // Setting up the UI
                             txt_name.text = listOfNotNull(it.firstName, it.lastName).joinToString(" ")
                             txt_phone.text = it.phoneNumber.orEmpty()
+                            txt_email.text = it.email.orEmpty()
                             txt_star.text = it.rating.toString()
 
                             // Load the image in img_avatar using Glide
                             Glide.with(this@RiderActivity)
                                 .load(it.avatar)
+                                .placeholder(R.drawable.app_icon)
                                 .into(img_avatar)
 
                             // Set up click listener for avatar image
